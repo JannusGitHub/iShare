@@ -89,7 +89,6 @@
                             </select>
                         </div>
                     </div>
-                    
                     <div class="mb-3">
                         <label for="textPassword" class="form-label">Password<span class="text-danger" title="Required">*</span></label>
                         <input type="password" class="form-control" name="password" id="textPassword" placeholder="Password">

@@ -176,7 +176,7 @@
                     
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" id="buttonChangeStatus" class=""><i id="iconChangeStatus" class="fa fa-check"></i> Submit</button>
+                        <button type="submit" id="buttonChangeStatus" class=""><i id="iconChangeStatus" class="fa fa-check"></i>&nbsp;<span id="spanButtonLabel">Submit</span></button>
                     </div>
                 </form>
             </div>
@@ -247,16 +247,19 @@
                 let libraryStatus = $(this).attr('library-status');
                 let libraryId = $(this).attr('library-id');
                 
+                console.log('libraryStatus', libraryStatus);
+                console.log('libraryId', libraryId);
                 $("#textChangeStatus").val(libraryStatus);
                 $("#textChangeId").val(libraryId);
 
                 if(libraryStatus == 1){
                     $("#paragraphChangeStatus").text('Are you sure to Approve?');
-                    $("#buttonChangeStatus").text('Approve');
+                    $("#spanButtonLabel").text('Approve');
                     $("#buttonChangeStatus").removeClass('btn btn-danger');
                     $("#buttonChangeStatus").addClass('btn btn-success');
                 }else if(libraryStatus == 2){
-                    $("#buttonChangeStatus").text('Reject');
+                    $("#paragraphChangeStatus").text('Are you sure to Reject?');
+                    $("#spanButtonLabel").text('Reject');
                     $("#buttonChangeStatus").removeClass('btn btn-success');
                     $("#buttonChangeStatus").addClass('btn btn-danger');
                 }

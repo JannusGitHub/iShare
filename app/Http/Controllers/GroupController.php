@@ -19,6 +19,7 @@ use Mail; // or use Illuminate\Support\Facades\Mail;
 use App\Models\Group;
 use App\Models\GroupLeader;
 use App\Models\GroupLeaderTitle;
+use App\Models\GroupLeaderMember;
 use App\Models\User;
 
 class GroupController extends Controller
@@ -84,11 +85,8 @@ class GroupController extends Controller
                                     DB::commit();
                                     return response()->json(['hasError' => 0]);
                                 }
-                                // return response()->json(['isGroupCodeExist'=> false, 'errorMessage'=>'The Group Leader not exist!']);
                             }
                         }
-    
-                        
                     } catch (\Exception $e) {
                         DB::rollback();
                         return response()->json(['hasError' => 1, 'exceptionError' => $e]);
@@ -203,7 +201,12 @@ class GroupController extends Controller
                 ->where('is_deleted', 0)
                 ->get();
 
-                if(count($isGroupLeaderExist) > 0){
+                $getGroupLeaderMemberDetails = GroupLeaderMember::where('member_name', $request->group_leader)
+                ->where('status', 1)
+                ->where('is_deleted', 0)
+                ->get();
+
+                if(count($isGroupLeaderExist) > 0 || count($getGroupLeaderMemberDetails) > 0){
                     return response()->json(['isGroupLeaderExist'=> true, 'errorMessage'=>'You are already in a group!']);
                 }else{
                     GroupLeader::insert([
@@ -223,29 +226,80 @@ class GroupController extends Controller
 
     public function getMyGroup(Request $request){
         date_default_timezone_set('Asia/Manila');
-        $getMyGroup = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_leader_name', $request->session_user_id)
+        // $getGroupDetails = Group::where('group_leader_name', $request->session_user_id);
+        $getGroupLeaderDetails = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_leader_name', $request->session_user_id)
             ->where('status', 1)
             ->where('is_deleted', 0)
             ->first();
+            // return $getGroupLeaderDetails;
+        $getGroupLeaderMemberDetails = GroupLeaderMember::where('member_name', $request->session_user_id)
+            ->where('status', 1)
+            ->where('is_deleted', 0)
+            ->first();
+            // return $getGroupLeaderMemberDetails;
 
-            $getGroupMembers = [];
-            if($getMyGroup != null){
-                $getGroupMembers = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_id', $getMyGroup->group_id)
-                ->where('status', 1)
-                ->where('is_deleted', 0)
-                ->get();
-            }
+        /**
+         * Check if user is Group Leader
+         */
+        $getMyGroup = [];
+        if($getGroupLeaderDetails != null){
+            $getMyGroup = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_id', $getGroupLeaderDetails->group_id)
+            ->where('status', 1)
+            ->where('is_deleted', 0)
+            ->first();
+            return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails]);
+        }
+
+        /**
+         * Check if user is a Member
+         */
+        if($getGroupLeaderMemberDetails != null){
+            $getMyGroup = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_id', $getGroupLeaderMemberDetails->group_id)
+            ->where('status', 1)
+            ->where('is_deleted', 0)
+            ->first();
+            return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails]);
+        }
+
+        return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails]);
         
-        return response()->json(['getMyGroup' => $getMyGroup, 'getGroupMembers' => $getGroupMembers]);
     }
     
     public function leaveGroup(Request $request){
-        $groupLeaderDeleted = GroupLeader::where('group_leader_name', $request->session_user_id)->delete();
+        $getGroupLeaderToBeDeleted = GroupLeader::where('group_leader_name', $request->session_user_id)->first();
+        // return $getGroupLeaderToBeDeleted;
+        if($getGroupLeaderToBeDeleted != null){
+            GroupLeaderTitle::where('group_leader_id', $getGroupLeaderToBeDeleted->id)->delete();
+            GroupLeaderMember::where('group_leader_id', $getGroupLeaderToBeDeleted->id)->delete();
+            GroupLeader::where('group_leader_name', $request->session_user_id)->delete();
+        }
+
+        $getGroupMemberToBeDeleted = GroupLeaderMember::where('member_name', $request->session_user_id)
+                ->where('status', 1)
+                ->where('is_deleted', 0)
+                ->first();
+        // return $getGroupMemberToBeDeleted;
+        if($getGroupMemberToBeDeleted != null){
+            GroupLeaderMember::where('member_name', $getGroupMemberToBeDeleted->member_name)->delete();
+        }
+        
+        
         return response()->json(['groupLeaderDeleted' => true, 'successMessage'=>'Left group Successfully']);
     }
 
     public function viewTitle(Request $request){
-        $groupLeaderTitleDetails = GroupLeaderTitle::where('is_deleted', 0)->get();
+        $groupLeaderTitleDetails = GroupLeader::with([
+                'section_info',
+                'group_leader_name_info', 
+                'group_leader_title_details',
+                'group_leader_members_details.member_name_info',
+            ])
+            ->where('group_leader_name',$request->session_user_id)
+            ->where('group_section', '!=', null)
+            ->where('group_number', '!=', null)
+            ->where('is_deleted', 0)
+            ->get();
+        // return $groupLeaderTitleDetails;
         $userLevel = User::where('id', $request->session_user_id)
             ->where('status', 1)
             ->where('is_deleted', 0)
@@ -256,25 +310,115 @@ class GroupController extends Controller
                 $result .= '<center><span class="badge badge-pill text-secondary" style="background-color: #E6E6E6">No Action</span></center>';
                 return $result;
             })
+            ->addColumn('group_number', function($row){
+                $result = "";
+                $result .= '<center><span>'.$row->group_number.'</span></center>';
+                return $result;
+            })
             ->addColumn('title', function($row){
                 $result = "";
-                $result .= '<center><span>'.$row->title.'</span></center>';
+                for ($i=0; $i < count($row->group_leader_title_details); $i++) {
+                    if($row->group_leader_title_details[$i]->approval_status == 1){
+                        $result .= '<center><span>'.$row->group_leader_title_details[$i]->title.' - <span class="badge badge-pill badge-success"> Approved</span></span></center>';
+                    }else{
+                        $result .= '<center><span class="">'.$row->group_leader_title_details[$i]->title.'</span></center>';
+                    }
+                }
+                return $result;
+            })
+            ->addColumn('group_member', function($row){
+                $result = "";
+                for ($i=0; $i < count($row->group_leader_members_details); $i++) { 
+                    $result .= '<center><span>'.$row->group_leader_members_details[$i]->member_name_info->fullname.'</span></center>';
+                }
                 return $result;
             })
             ->addColumn('status', function($row){
                 $result = "";
                 if($row->status == 0){
-                    $result .= '<center><span class="badge badge-pill text-secondary" style="background-color: #E6E6E6">Pending</span></center>';
+                    $result .= '<center><span class="badge badge-pill text-secondary" style="background-color: #E6E6E6">Not Active</span></center>';
                 }else if($row->status == 1){
-                    $result .= '<center><span class="badge badge-pill badge-success">Approved</span></center>';
-                }
-                else{
-                    $result .= '<center><span class="badge badge-pill badge-danger">Rejected</span></center>';
+                    $result .= '<center><span class="badge badge-pill badge-success">Active</span></center>';
                 }
                 return $result;
             })
             
-        ->rawColumns(['action','title', 'status'])
+        ->rawColumns(['action','group_number','title', 'group_member', 'status'])
         ->make(true);
+    }
+
+    public function addTitle(Request $request){
+        date_default_timezone_set('Asia/Manila');
+        session_start();
+        
+        $data = $request->all();
+        $rules = [
+            'group_number'  => 'required|numeric',
+            'title.*'         => 'required',
+        ];
+        if(!isset($request->section)){
+            $rules['section'] = 'required';
+        }else{
+            $rules['section'] = '';
+        }
+        if(!isset($request->group_members)){
+            $rules['group_members'] = 'required';
+        }else{
+            $rules['group_members'] = '';
+        }
+
+        /* For Insert */
+        if(!isset($request->title_id)){
+            $validator = Validator::make($data, $rules);
+
+            if ($validator->fails()) {
+                return response()->json(['validationHasError' => 1, 'error' => $validator->messages()]);
+            } else {
+                DB::beginTransaction();
+                try {
+                    $groupLeaderDetails = GroupLeader::with('group_leader_title_details')->where('group_leader_name', session('session_user_id'))
+                        ->where('status', 1)
+                        ->where('is_deleted', 0)
+                        ->first();
+                        if(count($groupLeaderDetails->group_leader_title_details) > 0){
+                            return response()->json(['isSubmittedTitles' => true, 'errorMessage' => 'You already submitted titles']);
+                        }else{
+                            // $implodedGroupMember = implode(", ",$request->group_members);
+                            GroupLeader::where('id', $groupLeaderDetails->id)->update([
+                                'group_number'  => $request->group_number,
+                                'group_section' => $request->section,
+                                // 'group_member'  => $implodedGroupMember,
+                            ]);
+                            for ($i=0; $i < count($request->title); $i++) { 
+                                $title = $request->title[$i];
+                                GroupLeaderTitle::insert([
+                                    'group_id'              => $groupLeaderDetails->group_id,
+                                    'group_leader_id'       => $groupLeaderDetails->id,
+                                    'title'                 => $title,
+                                    'approval_status'       => 0,
+                                    'created_at'            => date('Y-m-d H:i:s'),
+                                ]);
+                            }
+
+                            for ($i=0; $i < count($request->group_members); $i++) { 
+                                $memberName = $request->group_members[$i];
+                                GroupLeaderMember::insert([
+                                    'group_id'              => $groupLeaderDetails->group_id,
+                                    'group_leader_id'       => $groupLeaderDetails->id,
+                                    'member_name'           => $memberName,
+                                    'status'                => 1,
+                                    'created_at'            => date('Y-m-d H:i:s'),
+                                ]);
+                            }
+                            
+                            DB::commit();
+                            return response()->json(['hasError' => 0, 'successMessage' => 'Successfully Added!']);
+                        }
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    return response()->json(['hasError' => 1, 'exceptionError' => $e]);
+                }
+            }
+        }
     }
 }

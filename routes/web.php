@@ -44,6 +44,7 @@ Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 Route::get('/check_session', [UserController::class, 'checkSession'])->name('check_session');
 Route::get('/get_sections', [UserController::class, 'getSections'])->name('get_sections');
 Route::get('/get_users', [UserController::class, 'getUsers'])->name('get_users');
+Route::get('/get_users_except_faculty_for_group', [UserController::class, 'getUsersExceptFacultyForGroup'])->name('get_users_except_faculty_for_group');
 Route::get('/get_data_for_dashboard', [UserController::class, 'getDataForDashboard'])->name('get_data_for_dashboard');
 
 /**
@@ -70,10 +71,11 @@ Route::middleware('checkIfSessionNotExist')->group(function(){
     Route::get('/get_my_group', [GroupController::class, 'getMyGroup'])->name('get_my_group');
     Route::post('/leave_group', [GroupController::class, 'leaveGroup'])->name('leave_group');
     Route::get('/view_title', [GroupController::class, 'viewTitle'])->name('view_library');
+    Route::post('/add_title', [GroupController::class, 'addTitle'])->name('add_title');
 });
 
 /**
- * GROUP MANAGEMENT CONTROLLER
+ * LIBRARY MANAGEMENT CONTROLLER
  * Note: always use snake case naming convention to route & route name and camel case to the method for best practice
  */
 Route::middleware('checkIfSessionNotExist')->group(function(){
@@ -85,4 +87,19 @@ Route::middleware('checkIfSessionNotExist')->group(function(){
     Route::get('/view_library', [LibraryController::class, 'viewLibrary'])->name('view_library');
     Route::get('/download_file/{id}', [LibraryController::class, 'downloadLibraryFile'])->name('download_file');
     Route::post('/approved_status', [LibraryController::class, 'approvedStatus'])->name('approved_status');
+});
+
+/**
+ * LIBRARY MANAGEMENT CONTROLLER
+ * Note: always use snake case naming convention to route & route name and camel case to the method for best practice
+ */
+Route::middleware('checkIfSessionNotExist')->group(function(){
+    Route::get('/topics', function () {
+        return view('topics');
+    })->name('topics');
+    Route::get('/view_title_for_faculty', [LibraryController::class, 'viewTitleForFaculty'])->name('view_title_for_faculty');
+    Route::post('/approved_title', [LibraryController::class, 'approvedTitle'])->name('approved_title');
+    // Route::post('/add_library', [LibraryController::class, 'addLibrary'])->name('add_library');
+    // Route::get('/view_library', [LibraryController::class, 'viewLibrary'])->name('view_library');
+    // Route::get('/download_file/{id}', [LibraryController::class, 'downloadLibraryFile'])->name('download_file');
 });

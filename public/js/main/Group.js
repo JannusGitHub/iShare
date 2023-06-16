@@ -48,7 +48,7 @@ function getGroupList(){
                     html +=        `<div class="card-footer">`;
                     html +=            `<p class="card-text"><small class="text-muted">${moment(groupCreatedAt).format("dddd, MMM Do YYYY")} at ${moment(groupCreatedAt).format("h:mm A")}</small></p>`;
                     html +=            `<footer class="blockquote-footer">Owner <strong>${groupCreatedBy}</strong></footer>`;
-                    html +=            `<button type="button" class="btn btn-primary buttonJoinGroup" group-id="${hashedGroupId}" data-bs-toggle="modal" data-bs-target="#modalJoinGroup">Join Group</button>`;
+                    html +=            `<button type="button" class="btn btn-outline-primary buttonJoinGroup" group-id="${hashedGroupId}" data-bs-toggle="modal" data-bs-target="#modalJoinGroup">Join Group</button>`;
                     html +=        `</div>`;
                     html +=    `</div>`;
                     html +=`</div>`;
@@ -94,7 +94,7 @@ function getOneLatestGroup(){
                     html +=        `<div class="card-footer">`;
                     html +=            `<p class="card-text"><small class="text-muted">${moment(groupCreatedAt).format("dddd, MMM Do YYYY")} at ${moment(groupCreatedAt).format("h:mm A")}</small></p>`;
                     html +=            `<footer class="blockquote-footer">Owner <strong>${groupCreatedBy}</strong></footer>`;
-                    html +=            `<button type="button" class="btn btn-primary buttonJoinGroup" group-id="${hashedGroupId}" data-bs-toggle="modal" data-bs-target="#modalJoinGroup">Join Group</button>`;
+                    html +=            `<button type="button" class="btn btn-outline-primary buttonJoinGroup" group-id="${hashedGroupId}" data-bs-toggle="modal" data-bs-target="#modalJoinGroup">Join Group</button>`;
                     html +=        `</div>`;
                     html +=    `</div>`;
                     html +=`</div>`;
@@ -245,8 +245,8 @@ function getMyGroup(sessionUserId){
         },
         success: function(response){
             let getMyGroupArray = response['getMyGroup'];
-            let getGroupMembersArray = response['getGroupMembers'];
-            if(getMyGroupArray !== null){
+            if(getMyGroupArray != null){
+                console.log('not null');
                 let groupId = getMyGroupArray.id;
                 let groupName = getMyGroupArray['group_info'].group_name;
                 let groupCreatedAt = getMyGroupArray.created_at;
@@ -261,36 +261,12 @@ function getMyGroup(sessionUserId){
                 $('#divGroupDetails').append(html);
                 $('#buttonLeaveGroup').removeClass('d-none');
                 $('#buttonAddTitle').removeClass('d-none');
-
-                // if(getGroupMembersArray.length > 0){
-                //     for (let index = 0; index < getGroupMembersArray.length; index++) {
-                //         let groupId = getGroupMembersArray[index].id;
-                //         let groupName = getGroupMembersArray[index]['group_info'].group_name;
-                //         let groupCreatedAt = getGroupMembersArray[index].created_at;
-                //         let groupCreatedBy = getGroupMembersArray[index]['group_info']['group_creator_info'].fullname;
-                //         let hashedGroupId = getGroupId(groupId);
-                //         let html = "";
-                //         html +=`<div class="col-lg-12 col-md-12 col-sm-12">`;
-                //         html +=    `<div class="card h-100 text-center">`;
-                //         html +=        `<div class="card-body">`;
-                //         html +=            `<div class="mb-5"></div>`;
-                //         html +=            `<span><i class="fa-solid fa-users-rectangle fa-2xl" style="font-size: 3em"></i></span>`;
-                //         html +=            `<h4 class="fw-bold my-3">${groupName}</h4>`;
-                //         html +=        `</div>`;
-                //         html +=        `<div class="card-footer">`;
-                //         html +=            `<p class="card-text"><small class="text-muted">${moment(groupCreatedAt).format("dddd, MMM Do YYYY")} at ${moment(groupCreatedAt).format("h:mm A")}</small></p>`;
-                //         html +=            `<footer class="blockquote-footer">Owner <strong>${groupCreatedBy}</strong></footer>`;
-                //         // html +=            `<button type="button" class="btn btn-primary buttonJoinGroup" group-id="${hashedGroupId}" data-bs-toggle="modal" data-bs-target="#modalJoinGroup">Join Group</button>`;
-                //         html +=        `</div>`;
-                //         html +=    `</div>`;
-                //         html +=`</div>`;
-                //         $('#divGroup .row').append(html);
-                //     }
-                // }
                 $('#divGroup').removeClass('d-none');
                 $('#divGroupDetails').removeClass('d-none');
                 $('#noGroupList').addClass('d-none');
                 $('#noGroupDetails').addClass('d-none');
+            }else{
+                console.log('null');console.log('not null');
             }
         },
         error: function(data, xhr, status){
@@ -319,5 +295,97 @@ function leaveGroup(){
         error: function(data, xhr, status){
             toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
         },
+    });
+}
+
+function addTitle(){
+    let formData = $('#formAddTitle').serialize();
+	$.ajax({
+        url: "add_title",
+        method: "post",
+        data: formData,
+        dataType: "json",
+        beforeSend: function(){
+            $("#iconAddTitle").addClass('spinner-border spinner-border-sm');
+            $("#buttonSubmitTitle").addClass('disabled');
+            $("#iconAddTitle").removeClass('fa fa-check');
+        },
+        success: function(response){
+            if(response['validationHasError'] == 1){
+                toastr.error('Saving failed!');
+                if(response['error']['group_number'] === undefined){
+                    $("#textAddGroupNumber").removeClass('is-invalid');
+                    $("#textAddGroupNumber").attr('title', '');
+                }
+                else{
+                    $("#textAddGroupNumber").addClass('is-invalid');
+                    $("#textAddGroupNumber").attr('title', response['error']['group_number']);
+                }
+                if(response['error']['section'] === undefined){
+                    $("#selectSection").removeClass('is-invalid');
+                    $("#selectSection").attr('title', '');
+                }
+                else{
+                    $("#selectSection").addClass('is-invalid');
+                    $("#selectSection").attr('title', response['error']['section']);
+                }
+
+                if(response['error']['group_members'] === undefined){
+                    $(".select2-selection--multiple").attr('title', '');
+                    $(".select2-selection--multiple").css({ "border": "1px solid #C3D4DA", "borderRadius":"4px"})
+                }
+                else{
+                    $(".select2-selection--multiple").attr('title', response['error']['group_leader_name']);
+                    $(".select2-selection--multiple").css({ "border": "1px solid red", "borderRadius":"4px"})
+                }
+
+                if(response['error']['title.0'] === undefined){
+                    $('input[name="title[]"]')[0].classList.remove('is-invalid');
+                    $('input[name="title[]"]')[0].setAttribute('title', '');
+                }
+                else{
+                    $('input[name="title[]"]')[0].classList.add('is-invalid');
+                    $('input[name="title[]"]')[0].setAttribute('title', response['error']['title.0']);
+                }
+
+                if(response['error']['title.1'] === undefined){
+                    if($('input[name="title[]"]')[1]){
+                        $('input[name="title[]"]')[1].classList.remove('is-invalid');
+                        $('input[name="title[]"]')[1].setAttribute('title', '');
+                    }
+                }
+                else{
+                    $('input[name="title[]"]')[1].classList.add('is-invalid');
+                    $('input[name="title[]"]')[1].setAttribute('title', response['error']['title.1']);
+                }
+
+                if(response['error']['title.2'] === undefined){
+                    if($('input[name="title[]"]')[2]){
+                        $('input[name="title[]"]')[2].classList.remove('is-invalid');
+                        $('input[name="title[]"]')[2].setAttribute('title', '');
+                    }
+                }
+                else{
+                    $('input[name="title[]"]')[2].classList.add('is-invalid');
+                    $('input[name="title[]"]')[2].setAttribute('title', response['error']['title.2']);
+                }
+            }else {
+                if(response['isSubmittedTitles'] === true){
+                    toastr.warning(response['errorMessage']);
+                }else if(response['hasError'] === 0){
+                    toastr.success(response['successMessage']);
+                    $('#formAddTitle')[0].reset();
+                    $('#modalAddTitle').modal('hide');
+                    dataTablesTitle.draw();
+                }
+            }
+
+            $("#iconAddTitle").removeClass('spinner-border spinner-border-sm');
+            $("#buttonSubmitTitle").removeClass('disabled');
+            $("#iconAddTitle").addClass('fa fa-check');
+        },
+        error: function(data, xhr, status){
+            toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
     });
 }

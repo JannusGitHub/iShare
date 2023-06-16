@@ -15,9 +15,9 @@ class CreateGroupLeaderMembersTable extends Migration
     {
         Schema::create('group_leader_members', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('group_id')->comment = 'groups(table)';
-            $table->unsignedBigInteger('group_leader_id')->comment = 'group_leaders(table)';
-            $table->unsignedBigInteger('member_name')->comment = 'users(table)';
+            $table->unsignedBigInteger('group_id')->comment = 'groups(table) id';
+            $table->unsignedBigInteger('group_leader_id')->comment = 'group_leaders(table) id';
+            $table->unsignedBigInteger('member_name')->comment = 'users(table) id';
             $table->string('status')->nullable()->comment = '0-Not exist in Group, 1-Exist in Group';
 
            // Defaults

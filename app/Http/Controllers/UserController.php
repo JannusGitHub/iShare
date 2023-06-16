@@ -180,10 +180,40 @@ class UserController extends Controller
             $datas = User::orderby('fullname','asc')->select('id','fullname')
                         ->where('fullname', 'like', '%' . $search . '%')
                         ->where('status', 1)
+                        ->where('user_level_id', 3) // 3-student
                         ->get();
         }
 
-        // $response = [];
+        $response = [
+            "results" => []
+        ];
+            
+        foreach($datas as $data){
+            $response['results'][] = array(
+                "id" => $data->id,
+                "text" => $data->fullname,
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getUsersExceptFacultyForGroup(Request $request){
+        date_default_timezone_set('Asia/Manila');
+        $search = $request->search;
+
+        if($search == ''){
+            $datas = [];
+        }
+        else{
+            $datas = User::orderby('fullname','asc')->select('id','fullname')
+                        ->where('fullname', 'like', '%' . $search . '%')
+                        ->where('status', 1)
+                        ->where('user_level_id', 3) // 3-student
+                        ->where('id','!=', session('session_user_id'))
+                        ->get();
+        }
+
         $response = [
             "results" => []
         ];

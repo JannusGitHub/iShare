@@ -68,7 +68,11 @@ function approvedStatus(){
         method: "post",
         data: $('#formChangeStatus').serialize(),
         dataType: "json",
-        beforeSend: function(){},
+        beforeSend: function(){
+            $("#iconChangeStatus").removeClass('fa fa-check');
+            $("#iconChangeStatus").addClass('fa fa-spinner fa-pulse');
+            $("#buttonChangeStatus").addClass('disabled');
+        },
         success: function(response){
             if(response['validationHasError'] == 1){
                 toastr.error('Edit status failed!');
@@ -81,6 +85,44 @@ function approvedStatus(){
                     else if(response['status'] == 2){
                         toastr.success('Successfully Rejected!');
                         dataTablesLibrary.draw();
+                    }
+                }
+                $("#modalChangeStatus").modal('hide');
+                $("#formChangeStatus")[0].reset();
+            }
+            
+            $("#iconChangeStatus").removeClass('fa fa-spinner fa-pulse');
+            $("#buttonChangeStatus").removeAttr('disabled');
+            $("#iconChangeStatus").addClass('fa fa-check');
+        },
+        error: function(data, xhr, status){
+            toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+            $("#iconChangeStatus").removeClass('fa fa-spinner fa-pulse');
+            $("#buttonChangeStatus").removeAttr('disabled');
+            $("#iconChangeStatus").addClass('fa fa-check');
+        }
+    });
+}
+
+function approvedTitle(){
+    $.ajax({
+        url: "approved_title",
+        method: "post",
+        data: $('#formChangeStatus').serialize(),
+        dataType: "json",
+        beforeSend: function(){
+            $("#iconChangeStatus").removeClass('fa fa-check');
+            $("#iconChangeStatus").addClass('fa fa-spinner fa-pulse');
+            $("#buttonChangeStatus").addClass('disabled');
+        },
+        success: function(response){
+            if(response['validationHasError'] == 1){
+                toastr.error('Edit status failed!');
+            }else{
+                if(response['hasError'] == 0){
+                    if(response['status'] == 1){
+                        toastr.success('Successfully Approved!');
+                        dataTablesTitle.draw();
                     }
                 }
                 $("#modalChangeStatus").modal('hide');

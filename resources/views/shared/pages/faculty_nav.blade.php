@@ -31,19 +31,19 @@
                     </a>
                 </li>
                 
-                {{-- <li class="nav-header font-weight-bold">&nbsp;COORDINATOR</li>
-                <li class="nav-item has-treeview">
+                <li class="nav-header font-weight-bold">&nbsp;COORDINATOR</li>
+                {{-- <li class="nav-item has-treeview">
                     <a href="{{ route('dashboard') }}" class="nav-link">
                         <i class="fa-solid fa-pen-to-square"></i>
                         <p>Section</p>
                     </a>
-                </li>
+                </li> --}}
                 <li class="nav-item has-treeview">
-                    <a href="{{ route('dashboard') }}" class="nav-link">
+                    <a href="{{ route('topics') }}" class="nav-link">
                         <i class="fa-solid fa-pen-to-square"></i>
                         <p>Topics/Titles</p>
                     </a>
-                </li> --}}
+                </li>
             </ul>
         </nav>
     </div><!-- Sidebar -->

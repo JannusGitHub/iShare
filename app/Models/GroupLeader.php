@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 use App\Models\User;
 use App\Models\Group;
+use App\Models\GroupLeaderTitle;
+use App\Models\GroupLeaderMember;
+use App\Models\Section;
 class GroupLeader extends Model
 {
     use HasFactory;
@@ -20,5 +23,17 @@ class GroupLeader extends Model
 
     public function group_info(){
         return $this->hasOne(Group::class, 'id', 'group_id');
+    }
+    
+    public function section_info(){
+        return $this->hasOne(Section::class, 'id', 'group_section');
+    }
+
+    public function group_leader_title_details(){
+        return $this->hasMany(GroupLeaderTitle::class, 'group_leader_id', 'id');
+    }
+
+    public function group_leader_members_details(){
+        return $this->hasMany(GroupLeaderMember::class, 'group_leader_id', 'id');
     }
 }

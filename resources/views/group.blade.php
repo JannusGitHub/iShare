@@ -188,6 +188,7 @@
                 allowClear: true,
                 ajax: {
                     url: "{{ route('get_users') }}",
+                    // url: "{{ route('get_users_except_faculty_for_group') }}",
                     type: "get",
                     dataType: 'json',
                     delay: 250,
@@ -227,21 +228,6 @@
                 // getGroupById(groupId);
             });
             
-            // $(document).on('click', '.actionEditGroupStatus', function(){
-            //     let barangayGroupStatus = $(this).attr('barangay-mission-vision-status');
-            //     let barangayGroupId = $(this).attr('barangay-mission-vision-id');
-                
-            //     $("#textEditGroupStatus").val(barangayGroupStatus);
-            //     $("#textEditGroupStatusGroupId").val(barangayGroupId);
-
-            //     if(barangayGroupStatus == 1){
-            //         $("#paragraphEditGroupStatus").text('Are you sure to deactivate?');
-            //     }
-            //     else{
-            //         $("#paragraphEditGroupStatus").text('Are you sure to activate?');
-            //     }
-            // });
-
             // $("#formEditGroupStatus").submit(function(event){
             //     event.preventDefault();
             //     editGroupStatus();

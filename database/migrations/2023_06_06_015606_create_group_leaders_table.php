@@ -19,7 +19,7 @@ class CreateGroupLeadersTable extends Migration
             $table->unsignedBigInteger('group_leader_name')->nullable()->comment = 'users(table)';
             $table->integer('group_number')->nullable();
             $table->unsignedBigInteger('group_section')->nullable()->comment = 'sections(table)';
-            $table->string('status')->nullable()->comment = '0-Not exist in Group, 1-Exist in Group';
+            $table->string('status')->nullable()->default(1)->comment = '0-Not Active, 1-Active';
 
            // Defaults
             $table->tinyInteger('is_deleted')->nullable()->default(0)->comment = '0-Active, 1-Deleted';

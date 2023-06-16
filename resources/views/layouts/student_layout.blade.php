@@ -47,6 +47,12 @@
             .text-muted-dashboard{
                 color: #6c757d!important;
             }
+
+            .select2-selection--multiple{
+                border: 1px solid #C3D4DA;
+            }
+
+            @media (min-width: 1200px) { ... }
         </style>
     </head>
     <body class="hold-transition sidebar-mini">
