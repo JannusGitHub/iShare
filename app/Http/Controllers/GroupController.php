@@ -62,29 +62,28 @@ class GroupController extends Controller
                         // return $request->group_leaders;
     
                         if(isset($request->group_leaders)){
-                            for($index = 0; $index < count($request->group_leaders); $index++){
-                                /**
-                                 * Check if Group Leader exist to detect if they already joined
-                                 * if not then insert the Group Leader to join in the Group
-                                 */
-                                $isGroupLeaderExist = GroupLeader::whereIn('group_leader_name', $request->group_leaders)
-                                ->where('status', 1) // 0-Not exist in Group, 1-Exist in Group
-                                ->where('is_deleted', 0)
-                                ->get();
+                            /**
+                             * Check if Group Leader exist to detect if they already joined
+                             * if not then insert the Group Leader to join in the Group
+                             */
+                            $isGroupLeaderExist = GroupLeader::whereIn('group_leader_name', $request->group_leaders)
+                            ->where('status', 1) // 0-Not exist in Group, 1-Exist in Group
+                            ->where('is_deleted', 0)
+                            ->get();
 
-                                if(count($isGroupLeaderExist) > 0){
-                                    return response()->json(['isGroupLeaderExist'=> true, 'errorMessage'=>'The Group Leader already exist in a Group!']);
-                                }else{
+                            if(count($isGroupLeaderExist) > 0){
+                                return response()->json(['isGroupLeaderExist'=> true, 'errorMessage'=>'The Group Leader already exist in a Group!']);
+                            }else{
+                                for($index = 0; $index < count($request->group_leaders); $index++){
                                     GroupLeader::insert([
                                         'group_id' => $groupId,
                                         'group_leader_name' => $request->group_leaders[$index],
                                         'status' => 1, // 0-Not exist in Group, 1-Exist in Group	
                                         'created_at' => date('Y-m-d H:i:s')
                                     ]);
-
-                                    DB::commit();
-                                    return response()->json(['hasError' => 0]);
                                 }
+                                DB::commit();
+                                return response()->json(['hasError' => 0]);
                             }
                         }
                     } catch (\Exception $e) {
@@ -294,7 +293,7 @@ class GroupController extends Controller
                 'group_leader_title_details',
                 'group_leader_members_details.member_name_info',
             ])
-            ->where('group_leader_name',$request->session_user_id)
+            // ->where('group_leader_name',$request->session_user_id)
             ->where('group_section', '!=', null)
             ->where('group_number', '!=', null)
             ->where('is_deleted', 0)

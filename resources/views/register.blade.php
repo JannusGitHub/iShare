@@ -81,11 +81,11 @@
                         <div class="input-group mb-3">
                             <select class="form-control select2 select2-bs5" id="selectSection" name="section">
                                 <!-- Auto Generated -->
-                                <option value="0" disabled selected>Select One</option>
+                                {{-- <option value="0" disabled selected>Select One</option>
                                 <option value="1">BTVTE-CH</option>
                                 <option value="2">BTVTE-CP</option>
                                 <option value="3">BTVTE-ELEXT</option>
-                                <option value="4">BTVTE-IT</option>
+                                <option value="4">BTVTE-IT</option> --}}
                             </select>
                         </div>
                     </div>
@@ -118,6 +118,11 @@
         $('.select2-bs5').select2({
             theme: 'bootstrap-5'
         });
+
+        /**
+         * Get Sections
+        */
+        getSections($('#selectSection'));
         
         /**
          * Add user

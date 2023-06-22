@@ -20,6 +20,7 @@ use App\Models\User;
 use App\Models\UserLevel;
 use App\Models\Authentication;
 use App\Models\Library;
+use App\Models\Section;
 
 class UserController extends Controller
 {

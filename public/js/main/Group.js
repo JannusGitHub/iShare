@@ -245,10 +245,12 @@ function getMyGroup(sessionUserId){
         },
         success: function(response){
             let getMyGroupArray = response['getMyGroup'];
+            let getGroupLeaderMemberDetailsArray = response['getGroupLeaderMemberDetails'];
             if(getMyGroupArray != null){
-                console.log('not null');
+                console.log('getMyGroupArray not null');
                 let groupId = getMyGroupArray.id;
                 let groupName = getMyGroupArray['group_info'].group_name;
+                let groupCode = getMyGroupArray['group_info'].group_code;
                 let groupCreatedAt = getMyGroupArray.created_at;
                 let groupCreatedBy = getMyGroupArray['group_info']['group_creator_info'].fullname;
                 let hashedGroupId = getGroupId(groupId);
@@ -258,9 +260,20 @@ function getMyGroup(sessionUserId){
                 html +=    `<p class="card-text"><small class="text-muted">${moment(groupCreatedAt).format("dddd, MMM Do YYYY")}</small></p>`;
                 html +=    `<footer class="blockquote-footer">Owner <strong>${groupCreatedBy}</strong></footer>`;
                 html +=`</div>`;
+                html +=`<div class="card mx-3 text-center">`;
+                html +=     `<div class="card-body">`;
+                html +=         `Group Code: <span class="fw-bold">${groupCode}</span>`;
+                html +=     `</div>`;
+                html +=`</div>`;
                 $('#divGroupDetails').append(html);
                 $('#buttonLeaveGroup').removeClass('d-none');
-                $('#buttonAddTitle').removeClass('d-none');
+                if(getGroupLeaderMemberDetailsArray == null){
+                    console.log('getGroupLeaderMemberDetailsArray null');
+                    $('#buttonAddTitle').removeClass('d-none');
+                }else{
+                    console.log('getGroupLeaderMemberDetailsArray not null');
+                    $('#buttonAddTitle').addClass('d-none');
+                }
                 $('#divGroup').removeClass('d-none');
                 $('#divGroupDetails').removeClass('d-none');
                 $('#noGroupList').addClass('d-none');

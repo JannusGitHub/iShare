@@ -75,11 +75,6 @@
                                     <img style="width: 100px; height: auto;" class="my-4" src="{{ asset('/images/img/networking.png') }}" alt="">
                                 </div>
                             </div>
-                            {{-- <div class="card mx-3">
-                                <div class="card-body">
-                                    This is some text within a card body.
-                                </div>
-                            </div> --}}
                         </div>
                     </div>
                 </div>
@@ -150,11 +145,11 @@
                                                 </div>
                                                 <select class="form-control select2 select2-bs5" id="selectSection" name="section" placeholder="Section">
                                                     <!-- Auto Generated -->
-                                                    <option value="0" disabled selected>Select One</option>
+                                                    {{-- <option value="0" disabled selected>Select One</option>
                                                     <option value="1">BTVTE-CH</option>
                                                     <option value="2">BTVTE-CP</option>
                                                     <option value="3">BTVTE-ELEXT</option>
-                                                    <option value="4">BTVTE-IT</option>
+                                                    <option value="4">BTVTE-IT</option> --}}
                                                 </select>
                                             </div>
 
@@ -208,6 +203,11 @@
             $('.select2-bs5').select2({
                 theme: 'bootstrap-5'
             });
+
+            /**
+             * Get Sections
+            */
+            getSections($('#selectSection'));
 
             /**
              * Get all Groups

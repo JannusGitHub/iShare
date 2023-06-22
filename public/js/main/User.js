@@ -6,6 +6,9 @@ function sendOTP(){
         data: $('#formAddUser').serialize(),
         dataType: "json",
         beforeSend: function(){
+            $("#buttonLoginIcon").addClass('spinner-border spinner-border-sm');
+            $("#buttonLogin").addClass('disabled');
+            $("#buttonLoginIcon").removeClass('fa fa-check');
         },
         success: function(response){
             if(response['validationHasError'] == 1){
@@ -78,7 +81,9 @@ function sendOTP(){
                     toastr.warning('An error occured when sending email');
                 }
             }
-            
+            $("#buttonLoginIcon").removeClass('spinner-border spinner-border-sm');
+            $("#buttonLogin").removeClass('disabled');
+            $("#buttonLoginIcon").addClass('fa fa-check');
         },
         error: function(data, xhr, status){
             toastr.error('An error occured!\n' + 'Please check your internet connection');
@@ -253,6 +258,32 @@ function getUsers(selectElement){
 			}
 			else{
 				result = '<option value="0" disabled>No User Level found</option>';
+			}
+			selectElement.html(result);
+		},
+		error: function(data, xhr, status){
+			result = '<option value="0" disabled>Reload Again</option>';
+			selectElement.html(result);
+        }
+	});
+}
+
+function getSections(selectElement){
+	let result = '';
+	$.ajax({
+		url: 'get_sections',
+		method: 'get',
+		dataType: 'json',
+		success: function(response){
+            console.log(response);
+			let disabled = '';
+			if(response['sections'].length > 0){
+				for(let index = 0; index < response['sections'].length; index++){
+                    result += '<option value="' + response['sections'][index].id + '">' + response['sections'][index].section_name + '</option>';
+				}
+			}
+			else{
+				result = '<option value="0" disabled>No Section found</option>';
 			}
 			selectElement.html(result);
 		},
