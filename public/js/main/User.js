@@ -375,6 +375,132 @@ function editUserStatus(){
 }
 
 /**
+ * Forgot Password
+ */
+function sendResetPasswordCode(){
+	$.ajax({
+        url: "send_reset_password_code",
+        method: "post",
+        // headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        data: $('#formForgotPassword').serialize(),
+        dataType: "json",
+        beforeSend: function(){
+            $("#buttonSubmitIcon").addClass('spinner-border spinner-border-sm');
+            $("#buttonSubmit").addClass('disabled');
+            $("#buttonSubmitIcon").removeClass('fa fa-check');
+        },
+        success: function(response){
+            if(response['validationHasError'] == 1){
+                toastr.error('Saving user failed');
+                if(response['error']['email'] === undefined){
+                    $("#textEmail").removeClass('is-invalid');
+                    $("#textEmail").attr('title', '');
+                }
+                else{
+                    $("#textEmail").addClass('is-invalid');
+                    $("#textEmail").attr('title', response['error']['email']);
+                }
+            }else{
+                if(response['result'] == 1){
+                    if(response['userDetails'] != null){
+                        toastr.success('Reset Password Code has been sent to your email');
+
+                        $('#modalVerifyResetPasswordCode').modal('show');
+                        $('#textEmail', $('#modalChangePassword')).val(response['userDetails'].email);
+                        $('#textFullname', $('#modalChangePassword')).val(response['userDetails'].fullname);
+                        $("#textEmail").removeClass('is-invalid');
+                        $("#textEmail").attr('title', '');
+                    }else{
+                        toastr.error('Email is not found!');
+                    }
+                }else{
+                    toastr.warning('An error occured when sending email');
+                }
+            }
+            $("#buttonSubmitIcon").removeClass('spinner-border spinner-border-sm');
+            $("#buttonSubmit").removeClass('disabled');
+            $("#buttonSubmitIcon").addClass('fa fa-check');
+        },
+        error: function(data, xhr, status){
+            toastr.error('An error occured!\n' + 'Please check your internet connection');
+        }
+    });
+}
+
+function verifyResetPasswordCode(){
+	$.ajax({
+        url: "verify_reset_password_code",
+        method: "post",
+        data: $('#formVerifyResetPasswordCode').serialize(),
+        dataType: "json",
+        beforeSend: function(){
+            $("#iconVerifyResetPasswordCode").addClass('spinner-border spinner-border-sm');
+            $("#buttonVerifyResetPasswordCode").addClass('disabled');
+            $("#iconVerifyResetPasswordCode").removeClass('fa fa-check');
+        },
+        success: function(response){
+            if(response['data'].length > 0){
+                toastr.success('Reset Password Code successfully verified');
+                $('#modalChangePassword').modal('show');
+            }else{
+                toastr.error('Error Reset Password Code');
+            }
+            $("#iconVerifyResetPasswordCode").removeClass('spinner-border spinner-border-sm');
+            $("#buttonVerifyResetPasswordCode").removeClass('disabled');
+            $("#iconVerifyResetPasswordCode").addClass('fa fa-check');
+        },
+        error: function(data, xhr, status){
+            toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
+function formChangePassword(){
+	$.ajax({
+        url: "change_password",
+        method: "post",
+        data: $('#formChangePassword').serialize(),
+        dataType: "json",
+        beforeSend: function(){
+            $("#iconChangePassword").addClass('spinner-border spinner-border-sm');
+            $("#buttonChangePassword").addClass('disabled');
+            $("#iconChangePassword").removeClass('fa fa-check');
+        },
+        success: function(response){
+            if(response['validationHasError'] == 1){
+                toastr.error('Please fill required fields');
+                if(response['error']['password'] === undefined){
+                    $("#textPassword").removeClass('is-invalid');
+                    $("#textPassword").attr('title', '');
+                }
+                else{
+                    $("#textPassword").addClass('is-invalid');
+                    $("#textPassword").attr('title', response['error']['password']);
+                }
+                if(response['error']['confirm_password'] === undefined){
+                    $("#textConfirmPassword").removeClass('is-invalid');
+                    $("#textConfirmPassword").attr('title', '');
+                }
+                else{
+                    $("#textConfirmPassword").addClass('is-invalid');
+                    $("#textConfirmPassword").attr('title', response['error']['confirm_password']);
+                }
+            }else{
+                toastr.success('Password has been changed');
+                $('#modalChangePassword').modal('hide');
+                window.location = '/';
+            }
+            $("#iconChangePassword").removeClass('spinner-border spinner-border-sm');
+            $("#buttonChangePassword").removeClass('disabled');
+            $("#iconChangePassword").addClass('fa fa-check');
+        },
+        error: function(data, xhr, status){
+            toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
+/**
  * For Profile update
  */
 function getUserBySessionId(userId){
@@ -527,3 +653,4 @@ function editUser(){
         }
     });
 }
+

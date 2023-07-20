@@ -21,6 +21,7 @@ use App\Models\UserLevel;
 use App\Models\Authentication;
 use App\Models\Library;
 use App\Models\Section;
+use App\Models\ResetPasswordCode;
 
 class UserController extends Controller
 {
@@ -267,11 +268,6 @@ class UserController extends Controller
         ]);
     }
 
-
-
-
-
-
     public function viewUsers(Request $request){
         $userDetails = User::with('user_levels')->where('is_deleted', 0)
         ->where('is_authenticated', 1)
@@ -391,5 +387,90 @@ class UserController extends Controller
         $sections = Section::where('section_name_status', 1)
             ->where('is_deleted', 0)->get();
         return response()->json(['sections' => $sections]);
+    }
+
+    public function sendResetPasswordCode(Request $request){
+        date_default_timezone_set('Asia/Manila');
+        
+        $data = $request->all();
+        $rules = [
+            'email' => 'required|email',
+        ];
+
+        $validator = Validator::make($data, $rules);
+        if ($validator->fails()) {
+            return response()->json(['validationHasError' => 1, 'error' => $validator->messages()]);
+        }else{
+            $to = [$request->email];
+            $cc = ['isharesystemnotification@gmail.com'];
+            $resetPasswordCode = rand(100000, 999999);
+            $data = [
+                'resetPasswordCode' => $resetPasswordCode,
+                'subject' => "Reset Password Code",
+            ];
+
+            $email_recipients = [
+                'to' => $to,
+                'cc' => $cc,
+            ];
+
+            try {
+                Mail::send('mail.reset_password_code_notification', $data, function($message) use ($email_recipients, $data) {
+                    $message
+                    ->to($email_recipients['to'])
+                    ->cc($email_recipients['cc'])
+                    ->subject($data['subject']);
+                });
+
+                // Check for failures
+                if (Mail::failures()) {
+                    return response()->json(['result' => 0]);
+                }
+
+                ResetPasswordCode::insert([
+                    'reset_password_code' => $resetPasswordCode,
+                    'expired' => 0,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+
+                $userDetails = User::where('email', $request->email)->first();
+                
+                return response()->json(['result' => 1, 'userDetails' => $userDetails]);
+            } 
+            catch (Exception $e) {
+                return response()->json(['result' => 0]);
+            }
+        }
+    }
+
+    public function verifyResetPasswordCode(Request $request){
+        $resetPasswordCode = $request->reset_password_code;
+        // $data = DB::select( DB::raw("SELECT * FROM authentications WHERE otp_code = :optCode AND expired!=1 AND NOW() <= DATE_ADD(created_at, INTERVAL 1 MINUTE"), array(
+        $data = DB::select( DB::raw("SELECT * FROM reset_password_codes WHERE reset_password_code = :resetPasswordCode AND expired!=1"), array(
+            'resetPasswordCode' => $resetPasswordCode,
+        ));
+        return response()->json(['data' => $data]);
+    }
+
+    public function changePassword(Request $request){
+        $data = $request->all();
+        $validator = Validator::make($data, [
+            'email' => 'required',
+            'password' => 'required|min:8|required_with:confirm_password|same:confirm_password',
+            'confirm_password' => 'required|min:8',
+        ]);
+
+        if($validator->passes()){
+            User::where('email', $request->email)
+                ->update([
+                        'password' => Hash::make($request->password),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]
+                );
+            return response()->json(['hasError' => 0]);
+        }
+        else{
+            return response()->json(['validationHasError' => 1, 'error' => $validator->messages()]);
+        }
     }
 }

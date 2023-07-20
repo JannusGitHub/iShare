@@ -35,9 +35,16 @@ Route::middleware('checkIfSessionExist')->group(function(){
     Route::get('/register', function () {
         return view('register');
     })->name('register');
+    
+    Route::get('/forgot_password', function () {
+        return view('forgot_password');
+    })->name('forgot_password');
 });
 Route::post('/send_otp', [UserController::class, 'sendOTP'])->name('send_otp');
+Route::post('/send_reset_password_code', [UserController::class, 'sendResetPasswordCode'])->name('send_reset_password_code');
 Route::post('/verify_otp', [UserController::class, 'verifyOTP'])->name('verify_otp');
+Route::post('/verify_reset_password_code', [UserController::class, 'verifyResetPasswordCode'])->name('verify_reset_password_code');
+Route::post('/change_password', [UserController::class, 'changePassword'])->name('change_password');
 Route::post('/register_user', [UserController::class, 'registerUser'])->name('register_user');
 Route::get('/sign_in', [UserController::class, 'signIn'])->name('sign_in');
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
