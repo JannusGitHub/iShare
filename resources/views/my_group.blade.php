@@ -207,7 +207,7 @@
             /**
              * Get Sections
             */
-            getSections($('#selectSection'));
+            getSectionsForMyGroup($('#selectSection'));
 
             /**
              * Get all Groups

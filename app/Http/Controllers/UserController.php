@@ -384,14 +384,13 @@ class UserController extends Controller
 
     public function getSections(Request $request){
 
-        $sections = Section::where('section_name_status', 1)
-            ->where('is_deleted', 0)->get();
+        $sections = Section::where('is_deleted', 0)->get();
         return response()->json(['sections' => $sections]);
     }
     
     public function getSectionsForMyGroup(Request $request){
 
-        $sections = Section::where('section_name_status', 0)
+        $sections = Section::where('section_name_status', 1)
             ->where('is_deleted', 0)->get();
         return response()->json(['sections' => $sections]);
     }
