@@ -388,6 +388,13 @@ class UserController extends Controller
             ->where('is_deleted', 0)->get();
         return response()->json(['sections' => $sections]);
     }
+    
+    public function getSectionsForMyGroup(Request $request){
+
+        $sections = Section::where('section_name_status', 0)
+            ->where('is_deleted', 0)->get();
+        return response()->json(['sections' => $sections]);
+    }
 
     public function sendResetPasswordCode(Request $request){
         date_default_timezone_set('Asia/Manila');

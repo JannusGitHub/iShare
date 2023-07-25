@@ -9,7 +9,8 @@
             class="brand-image img-circle elevation-3"
             style="opacity: .8">
 
-        <span class="brand-text font-weight-light font-size"><h5>iShare</h5></span>
+        {{-- <span class="brand-text font-weight-light font-size"><h5>iShare</h5></span> --}}
+        <img src="{{ asset('/images/img/ishare_black.png') }}" style="width: 100px" alt="">
     </a> <!-- System title and logo -->
 
     <!-- Sidebar -->

@@ -50,6 +50,7 @@ Route::get('/sign_in', [UserController::class, 'signIn'])->name('sign_in');
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 Route::get('/check_session', [UserController::class, 'checkSession'])->name('check_session');
 Route::get('/get_sections', [UserController::class, 'getSections'])->name('get_sections');
+Route::get('/get_sections_for_my_group', [UserController::class, 'getSectionsForMyGroup'])->name('get_sections_for_my_group');
 Route::get('/get_users', [UserController::class, 'getUsers'])->name('get_users');
 Route::get('/get_users_except_faculty_for_group', [UserController::class, 'getUsersExceptFacultyForGroup'])->name('get_users_except_faculty_for_group');
 Route::get('/get_data_for_dashboard', [UserController::class, 'getDataForDashboard'])->name('get_data_for_dashboard');
@@ -58,7 +59,7 @@ Route::get('/get_data_for_dashboard', [UserController::class, 'getDataForDashboa
  * GROUP MANAGEMENT CONTROLLER
  * Note: always use snake case naming convention to route & route name and camel case to the method for best practice
  */
-Route::middleware('checkIfSessionNotExist')->group(function(){
+// Route::middleware('checkIfSessionNotExist')->group(function(){
     Route::get('/group', function () {
         return view('group');
     })->name('group');
@@ -79,7 +80,7 @@ Route::middleware('checkIfSessionNotExist')->group(function(){
     Route::post('/leave_group', [GroupController::class, 'leaveGroup'])->name('leave_group');
     Route::get('/view_title', [GroupController::class, 'viewTitle'])->name('view_library');
     Route::post('/add_title', [GroupController::class, 'addTitle'])->name('add_title');
-});
+// });
 
 /**
  * LIBRARY MANAGEMENT CONTROLLER

@@ -6,7 +6,8 @@
             <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="" class="nav-link">iShare</a>
+            {{-- <a href="" class="nav-link">iShare</a> --}}
+            <img src="{{ asset('/images/img/ishare_black.png') }}" style="width: 100px" alt="">
         </li>
     </ul>
 

@@ -294,6 +294,32 @@ function getSections(selectElement){
 	});
 }
 
+function getSectionsForMyGroup(selectElement){
+	let result = '';
+	$.ajax({
+		url: 'get_sections_for_my_group',
+		method: 'get',
+		dataType: 'json',
+		success: function(response){
+            console.log(response);
+			let disabled = '';
+			if(response['sections'].length > 0){
+				for(let index = 0; index < response['sections'].length; index++){
+                    result += '<option value="' + response['sections'][index].id + '">' + response['sections'][index].section_name + '</option>';
+				}
+			}
+			else{
+				result = '<option value="0" disabled>No Section found</option>';
+			}
+			selectElement.html(result);
+		},
+		error: function(data, xhr, status){
+			result = '<option value="0" disabled>Reload Again</option>';
+			selectElement.html(result);
+        }
+	});
+}
+
 function getCustomerById(userId){
     $.ajax({
         url: "get_user_by_id",

@@ -44,12 +44,12 @@
         <div class="row mx-auto align-items-center">
             <div class="d-flex justify-content-center py-4">
                 <a href="#" class="logo d-flex align-items-center w-auto">
-                    <img src="{{ asset('/images/img/ishare.png') }}" alt="">
-                    <span class="d-none d-lg-block">iSHARE</span>
+                    <img src="{{ asset('/images/img/ishare_black.png') }}" alt="">
+                    {{-- <span class="d-none d-lg-block">iSHARE</span> --}}
                 </a>
             </div>
 
-            <div class="col-lg-12 shadow p-4 rounded" style="background-color: beige; background-position: center;">
+            <div class="col-lg-7 mx-auto shadow p-4 rounded" style="background-color: beige; background-position: center;">
                 <h3 class="fw-bold text-center">Create an Account</h3>
                 <form id="formAddUser">
                     {{-- <meta name="csrf-token" content="{{ csrf_token() }}" /> --}}
