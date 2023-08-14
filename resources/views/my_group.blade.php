@@ -134,9 +134,10 @@
                                         <div class="card-body">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend" style="width: 50% !important;">
-                                                    <span class="input-group-text w-100 text-left" id="inputLibrary-sizing-default">Group Number</span>
+                                                    {{-- <span class="input-group-text w-100 text-left" id="inputLibrary-sizing-default">Group Number</span> --}}
+                                                    <span class="input-group-text w-100 text-left" id="inputLibrary-sizing-default">Group</span>
                                                 </div>
-                                                <input type="text" class="form-control" name="group_number" id="textAddGroupNumber" placeholder="Group Number">
+                                                <input type="text" class="form-control" name="group_number" id="textAddGroupNumber" placeholder="Group">
                                             </div>
 
                                             <div class="input-group mb-3">

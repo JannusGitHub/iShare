@@ -17,7 +17,7 @@ class CreateGroupLeadersTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('group_id')->comment = 'groups(table)';
             $table->unsignedBigInteger('group_leader_name')->nullable()->comment = 'users(table)';
-            $table->integer('group_number')->nullable();
+            $table->string('group_number')->nullable();
             $table->unsignedBigInteger('group_section')->nullable()->comment = 'sections(table)';
             $table->string('status')->nullable()->default(1)->comment = '0-Not Active, 1-Active';
 

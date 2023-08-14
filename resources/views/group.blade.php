@@ -80,9 +80,9 @@
                                     
                                     <div class="input-group mb-3">
                                         <div class="input-group-prepend" style="width: 50% !important;">
-                                            <span class="input-group-text w-100 text-left" id="inputGroup-sizing-default">Group Code</span>
+                                            <span class="input-group-text w-100 text-left" id="inputGroup-sizing-default">Group Code&nbsp;<i class="fas fa-lg fa-info-circle" title="The generated code will only be viewable after the creation of the group"></i></span>
                                         </div>
-                                        <input type="text" class="form-control" name="group_code" id="textAddGroupCode">
+                                        <input type="text" class="form-control" name="group_code" id="textAddGroupCode" readonly placeholder="Auto Generated">
                                     </div>
 
                                     <div class="input-group mb-3">

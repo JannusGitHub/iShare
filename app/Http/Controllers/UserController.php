@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Mail; // or use Illuminate\Support\Facades\Mail;
 
+
 /**
  * Import Models here
  */
@@ -22,6 +23,7 @@ use App\Models\Authentication;
 use App\Models\Library;
 use App\Models\Section;
 use App\Models\ResetPasswordCode;
+use App\Rules\CustomEmailValidation;
 
 class UserController extends Controller
 {
@@ -31,7 +33,7 @@ class UserController extends Controller
         $data = $request->all();
         $rules = [
             'tupt_id_number' => 'required|unique:users',
-            'email' => 'required|email|unique:users',
+            'email' => ['required', 'email', 'unique:users', new CustomEmailValidation],
             'fullname' => 'required|max:255', // or regex:/^[a-zA-Z ]+$/
             'password' => 'required|alphaNum|min:8|required_with:confirm_password|same:confirm_password',
             'confirm_password' => 'required|alphaNum|min:8',
@@ -102,7 +104,7 @@ class UserController extends Controller
         $data = $request->all();
         $rules = [
             'tupt_id_number' => 'required|unique:users',
-            'email' => 'required|email|unique:users',
+            'email' => ['required', 'email', 'unique:users', new CustomEmailValidation],
             'fullname' => 'required|max:255', // or regex:/^[a-zA-Z ]+$/
             'password' => 'required|alphaNum|min:8|required_with:confirm_password|same:confirm_password',
             'confirm_password' => 'required|alphaNum|min:8',
@@ -389,7 +391,6 @@ class UserController extends Controller
     }
     
     public function getSectionsForMyGroup(Request $request){
-
         $sections = Section::where('section_name_status', 1)
             ->where('is_deleted', 0)->get();
         return response()->json(['sections' => $sections]);

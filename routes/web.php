@@ -78,7 +78,7 @@ Route::get('/get_data_for_dashboard', [UserController::class, 'getDataForDashboa
     Route::post('/join_group', [GroupController::class, 'joinGroup'])->name('join_group');
     Route::get('/get_my_group', [GroupController::class, 'getMyGroup'])->name('get_my_group');
     Route::post('/leave_group', [GroupController::class, 'leaveGroup'])->name('leave_group');
-    Route::get('/view_title', [GroupController::class, 'viewTitle'])->name('view_library');
+    Route::get('/view_title', [GroupController::class, 'viewTitle'])->name('view_title');
     Route::post('/add_title', [GroupController::class, 'addTitle'])->name('add_title');
 // });
 

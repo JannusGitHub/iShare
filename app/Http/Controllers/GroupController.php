@@ -24,14 +24,24 @@ use App\Models\User;
 
 class GroupController extends Controller
 {
+    public function generateUniqueCode()
+    {
+        $code = random_int(100000, 999999);
+        $isGroupCodeExisted = Group::where("group_code", "=", $code)->get();
+        if(count($isGroupCodeExisted) > 0){
+            return random_int(100000, 999999);
+        }
+        return $code;
+    }
+    
     public function addGroup(Request $request){
         date_default_timezone_set('Asia/Manila');
         session_start();
-        
+
         $data = $request->all();
         $rules = [
             'group_name' => 'required|string',
-            'group_code' => 'required|string',
+            // 'group_code' => 'required|string',
         ];
         if(!isset($request->group_leaders)){
             $rules['group_leader_name'] = 'required';
@@ -54,7 +64,7 @@ class GroupController extends Controller
                     try {
                         $groupId = Group::insertGetId([
                             'group_name' => $request->group_name,
-                            'group_code' => $request->group_code,
+                            'group_code' => $this->generateUniqueCode(),
                             'created_by' => session('session_user_id'),
                             'created_at' => date('Y-m-d H:i:s'),
                             'is_deleted' => 0
@@ -352,7 +362,8 @@ class GroupController extends Controller
         
         $data = $request->all();
         $rules = [
-            'group_number'  => 'required|numeric',
+            // 'group_number'  => 'required|numeric',
+            'group_number'  => 'required|string',
             'title.*'         => 'required',
         ];
         if(!isset($request->section)){

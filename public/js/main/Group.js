@@ -113,7 +113,10 @@ function getOneLatestGroup(){
 }
 
 function addGroup(){
-    let formData = $('#formAddGroup').serialize();
+    let groupName = $('#textAddGroupName').val();
+    let qwe = hashedId(groupName);
+    let formData = $('#formAddGroup').serialize()+'&hashed='+qwe;
+    console.log('qwe', qwe);
 	$.ajax({
         url: "add_group",
         method: "post",
