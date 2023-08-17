@@ -49,7 +49,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>Action</th>
-                                                    <th>Group Number</th>
+                                                    <th>Group</th>
                                                     <th>Group Leader</th>
                                                     <th>Section</th>
                                                     <th>Title</th>

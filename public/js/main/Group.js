@@ -248,14 +248,15 @@ function getMyGroup(sessionUserId){
         },
         success: function(response){
             let getMyGroupArray = response['getMyGroup'];
+            let getAllMembersInGroupArray = response['getAllMembersInGroup'];
             let getGroupLeaderMemberDetailsArray = response['getGroupLeaderMemberDetails'];
             if(getMyGroupArray != null){
                 console.log('getMyGroupArray not null');
                 let groupId = getMyGroupArray.id;
-                let groupName = getMyGroupArray['group_info'].group_name;
-                let groupCode = getMyGroupArray['group_info'].group_code;
-                let groupCreatedAt = getMyGroupArray.created_at;
-                let groupCreatedBy = getMyGroupArray['group_info']['group_creator_info'].fullname;
+                let groupName = getMyGroupArray[0]['group_info'].group_name;
+                let groupCode = getMyGroupArray[0]['group_info'].group_code;
+                let groupCreatedAt = getMyGroupArray[0].created_at;
+                let groupCreatedBy = getMyGroupArray[0]['group_info']['group_creator_info'].fullname;
                 let hashedGroupId = getGroupId(groupId);
                 let html = "";
                 html +=`<div class="text-center">`;
@@ -263,19 +264,25 @@ function getMyGroup(sessionUserId){
                 html +=    `<p class="card-text"><small class="text-muted">${moment(groupCreatedAt).format("dddd, MMM Do YYYY")}</small></p>`;
                 html +=    `<footer class="blockquote-footer">Owner <strong>${groupCreatedBy}</strong></footer>`;
                 html +=`</div>`;
-                html +=`<div class="card mx-3 text-center">`;
-                html +=     `<div class="card-body">`;
-                html +=         `Group Code: <span class="fw-bold">${groupCode}</span>`;
-                html +=     `</div>`;
+                html +=`<div class="mx-3 text-center">`;
+                html +=         `<div class="border-top py-2">Group Code: <span class="fw-bold">${groupCode}</span></div>`;
+                html +=         `<div class="border-top py-2"><a class="link-dark" data-bs-toggle="collapse" href="#members" role="button">See Members <i class="fa-solid fa-chevron-down"></i></a></div>`;
+                html +=         `<div class="collapse" id="members">`;
+                                if(getAllMembersInGroupArray.length > 0){
+                                    for (let i = 0; i < getAllMembersInGroupArray.length; i++) {
+                html +=                 `<div>${getAllMembersInGroupArray[i]}</div>`;
+                                    }
+                                }
+                html +=         `</div>`;
                 html +=`</div>`;
                 $('#divGroupDetails').append(html);
                 $('#buttonLeaveGroup').removeClass('d-none');
-                if(getGroupLeaderMemberDetailsArray == null){
-                    console.log('getGroupLeaderMemberDetailsArray null');
-                    $('#buttonAddTitle').removeClass('d-none');
-                }else{
+                if(getGroupLeaderMemberDetailsArray.length > 0){
                     console.log('getGroupLeaderMemberDetailsArray not null');
                     $('#buttonAddTitle').addClass('d-none');
+                }else{
+                    console.log('getGroupLeaderMemberDetailsArray null');
+                    $('#buttonAddTitle').removeClass('d-none');
                 }
                 $('#divGroup').removeClass('d-none');
                 $('#divGroupDetails').removeClass('d-none');

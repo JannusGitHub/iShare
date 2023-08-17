@@ -59,7 +59,7 @@ Route::get('/get_data_for_dashboard', [UserController::class, 'getDataForDashboa
  * GROUP MANAGEMENT CONTROLLER
  * Note: always use snake case naming convention to route & route name and camel case to the method for best practice
  */
-// Route::middleware('checkIfSessionNotExist')->group(function(){
+Route::middleware('checkIfSessionNotExist')->group(function(){
     Route::get('/group', function () {
         return view('group');
     })->name('group');
@@ -80,7 +80,7 @@ Route::get('/get_data_for_dashboard', [UserController::class, 'getDataForDashboa
     Route::post('/leave_group', [GroupController::class, 'leaveGroup'])->name('leave_group');
     Route::get('/view_title', [GroupController::class, 'viewTitle'])->name('view_title');
     Route::post('/add_title', [GroupController::class, 'addTitle'])->name('add_title');
-// });
+});
 
 /**
  * LIBRARY MANAGEMENT CONTROLLER

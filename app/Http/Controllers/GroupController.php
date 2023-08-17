@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 use Auth; // or use Illuminate\Support\Facades\Auth;
 use DataTables;
 use Carbon\Carbon;
@@ -233,18 +234,91 @@ class GroupController extends Controller
         }
     }
 
+    // public function getMyGroup(Request $request){
+    //     date_default_timezone_set('Asia/Manila');
+    //     // $getGroupDetails = Group::where('group_leader_name', $request->session_user_id);
+    //     $getGroupLeaderDetails = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_leader_name', $request->session_user_id)
+    //         ->where('status', 1)
+    //         ->where('is_deleted', 0)
+    //         ->get();
+    //         // return $getGroupLeaderDetails;
+    //     $getGroupLeaderMemberDetails = GroupLeaderMember::where('member_name', $request->session_user_id)
+    //         ->where('status', 1)
+    //         ->where('is_deleted', 0)
+    //         ->get();
+    //         // return $getGroupLeaderMemberDetails;
+
+    //     /**
+    //      * Check if user is Group Leader
+    //      */
+    //     $getMyGroup = [];
+    //     if($getGroupLeaderDetails != null){
+    //         $getMyGroup = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_id', $getGroupLeaderDetails[0]->group_id)
+    //         ->where('status', 1)
+    //         ->where('is_deleted', 0)
+    //         ->get();
+    //         return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails]);
+    //     }
+
+    //     /**
+    //      * Check if user is a Member
+    //      */
+    //     if(count($getGroupLeaderMemberDetails) > 0){
+    //         $getMyGroup = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_id', $getGroupLeaderMemberDetails[0]->group_id)
+    //         ->where('status', 1)
+    //         ->where('is_deleted', 0)
+    //         ->get();
+    //         return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails]);
+    //     }
+
+    //     return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails]);
+        
+    // }
     public function getMyGroup(Request $request){
         date_default_timezone_set('Asia/Manila');
         // $getGroupDetails = Group::where('group_leader_name', $request->session_user_id);
         $getGroupLeaderDetails = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_leader_name', $request->session_user_id)
             ->where('status', 1)
             ->where('is_deleted', 0)
-            ->first();
+            ->get();
             // return $getGroupLeaderDetails;
+
+        // $getGroupLeaderDetails = DB::table('group_leaders')
+        //     ->join('group_leader_members', 'group_leaders.id', '=', 'group_leader_members.group_leader_id')
+        //     ->join('users', 'group_leader_members.member_name', '=', 'users.id')
+        //     ->select('group_leaders.*', 'group_leader_members.*', 'users.*')
+        //     ->get();
+        // return $getGroupLeaderDetails;
+
+        $getAllGroupLeaderDetails = GroupLeader::with(['group_leader_name_info'])->where('status', 1)
+            ->where('is_deleted', 0)
+            ->get();
+            // return $getAllGroupLeaderDetails;
+
+        $getAllGroupLeaderMemberDetails = GroupLeaderMember::with(['member_name_info'])->where('status', 1)
+            ->where('is_deleted', 0)
+            ->get();
+            // return $getAllGroupLeaderMemberDetails;
+        $getAllMembersInGroup = [];
+        for ($i=0; $i < count($getAllGroupLeaderMemberDetails); $i++) { 
+            $getAllMembersInGroup[] = $getAllGroupLeaderMemberDetails[$i]->member_name_info->fullname;
+            
+        }
+        // for ($i=0; $i < count($getAllGroupLeaderDetails); $i++) { 
+        //     $getAllMembersInGroup[] = $getAllGroupLeaderDetails[$i]->group_leader_name_info->fullname;
+            
+        //     for ($j=0; $j < count($getAllGroupLeaderMemberDetails); $j++) { 
+        //         if (!in_array($getAllGroupLeaderMemberDetails[$j]->member_name_info->fullname, $getAllMembersInGroup)){
+        //             $getAllMembersInGroup[] = $getAllGroupLeaderMemberDetails[$j]->member_name_info->fullname;
+        //         }
+        //     }
+        // }
+        // return $getAllMembersInGroup;
+
         $getGroupLeaderMemberDetails = GroupLeaderMember::where('member_name', $request->session_user_id)
             ->where('status', 1)
             ->where('is_deleted', 0)
-            ->first();
+            ->get();
             // return $getGroupLeaderMemberDetails;
 
         /**
@@ -252,22 +326,22 @@ class GroupController extends Controller
          */
         $getMyGroup = [];
         if($getGroupLeaderDetails != null){
-            $getMyGroup = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_id', $getGroupLeaderDetails->group_id)
+            $getMyGroup = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_id', $getGroupLeaderDetails[0]->group_id)
             ->where('status', 1)
             ->where('is_deleted', 0)
-            ->first();
-            return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails]);
+            ->get();
+            return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails, 'getAllMembersInGroup'=> $getAllMembersInGroup]);
         }
 
         /**
          * Check if user is a Member
          */
-        if($getGroupLeaderMemberDetails != null){
-            $getMyGroup = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_id', $getGroupLeaderMemberDetails->group_id)
+        if(count($getGroupLeaderMemberDetails) > 0){
+            $getMyGroup = GroupLeader::with(['group_info.group_creator_info','group_leader_name_info'])->where('group_id', $getGroupLeaderMemberDetails[0]->group_id)
             ->where('status', 1)
             ->where('is_deleted', 0)
-            ->first();
-            return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails]);
+            ->get();
+            return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails, 'getAllMembersInGroup'=> $getAllMembersInGroup]);
         }
 
         return response()->json(['getMyGroup' => $getMyGroup, 'getGroupLeaderMemberDetails' => $getGroupLeaderMemberDetails]);
